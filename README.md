@@ -1,2 +1,2 @@
-# Secreto_Heladeria_proyecto
-Proyecto integrado 
+# Secreto_Heladeria
+Proyecto integrado

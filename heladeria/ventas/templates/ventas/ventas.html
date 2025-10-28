@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Ventas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center text-primary">Historial de Ventas</h1>
+
+    {% if ventas %}
+        {% for venta in ventas %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    Venta #{{ venta.id }} 
+                    <small class="text-muted">({{ venta.fecha_venta|date:"d M Y - H:i" }})</small>
+                </h5>
+                <span class="badge bg-success fs-6">
+                    Total: ${{ venta.total|floatformat:0 }}
+                </span>
+            </div>
+            
+            <div class="card-body">
+                <h6 class="border-bottom pb-2 mb-3 text-secondary">Detalles de la Venta:</h6>
+                
+                <ul class="list-group list-group-flush">
+                    {% for detalle in venta.detalles.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div class="col-8">
+                            <span class="fw-bold text-capitalize">{{ detalle.producto.nombre }}</span>
+                            <small class="text-muted d-block">
+                                ${{ detalle.precio_unitario|floatformat:0 }} c/u
+                            </small>
+                        </div>
+
+                        <div class="col-4 text-end">
+                            <span class="me-3">{{ detalle.cantidad }} ud.</span>
+                            <span class="fw-bold">${{ detalle.subtotal|floatformat:0 }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <p class="text-end mt-3 mb-0 fw-bold pt-2 border-top">
+                    Total Pagado: ${{ venta.total|floatformat:0 }}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info text-center mt-5 p-5 border shadow">
+            <p class="lead mb-4">No se han registrado ventas todavía.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

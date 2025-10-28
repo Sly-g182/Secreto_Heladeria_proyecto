@@ -1,0 +1,32 @@
+[
+    {
+        "model": "productos.categoria",
+        "pk": 1,
+        "fields": {"nombre": "Helado", "descripcion": "Diferentes tipos de helado"}
+    },
+    {
+        "model": "productos.categoria",
+        "pk": 2,
+        "fields": {"nombre": "Pastel", "descripcion": "Variedad de pasteles"}
+    },
+    {
+        "model": "productos.producto",
+        "pk": 1,
+        "fields": {"nombre": "Helado Vainilla", "descripcion": "Helado clásico de vainilla", "categoria": 1, "precio": 2000, "stock": 50, "fecha_vencimiento": "2025-12-31"}
+    },
+    {
+        "model": "productos.producto",
+        "pk": 2,
+        "fields": {"nombre": "Helado Chocolate", "descripcion": "Helado de chocolate premium", "categoria": 1, "precio": 2200, "stock": 40, "fecha_vencimiento": "2025-12-31"}
+    },
+    {
+        "model": "productos.producto",
+        "pk": 3,
+        "fields": {"nombre": "Pastel Chocolate", "descripcion": "Pastel de chocolate con cobertura", "categoria": 2, "precio": 5000, "stock": 20, "fecha_vencimiento": "2025-11-30"}
+    },
+    {
+        "model": "productos.producto",
+        "pk": 4,
+        "fields": {"nombre": "Pastel Vainilla", "descripcion": "Pastel de vainilla clásico", "categoria": 2, "precio": 4500, "stock": 25, "fecha_vencimiento": "2025-11-30"}
+    }
+]

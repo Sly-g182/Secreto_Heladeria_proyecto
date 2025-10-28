@@ -1,0 +1,50 @@
+[
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {"name": "Marketing"}
+    },
+    {
+        "model": "auth.group",
+        "pk": 2,
+        "fields": {"name": "Cliente"}
+    },
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username": "admin_marketing",
+            "password": "pbkdf2_sha256$260000$A9d1Vl9x4Y3z$j+D7Uj6O2v5g2T9M0jG9w7s4z8w4H1p6V3q4X1e9N2o=",
+            "is_superuser": false,
+            "is_staff": true,
+            "is_active": true,
+            "email": "marketing@gmail.com",
+            "groups": [1],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "username": "Pedro",
+            "password": "pbkdf2_sha256$260000$A9d1Vl9x4Y3z$j+D7Uj6O2v5g2T9M0jG9w7s4z8w4H1p6V3q4X1e9N2o=",
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "email": "pedro.21g@gmail.com",
+            "groups": [2],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "clientes.cliente",
+        "pk": 1,
+        "fields": {
+            "user": 2,
+            "rut": "12345678-9",
+            "telefono": "987654321",
+            "direccion": "Calle Falsa 123"
+        }
+    }
+]

@@ -1,0 +1,17 @@
+[
+    {
+        "model": "ventas.venta",
+        "pk": 1,
+        "fields": {"cliente": 1, "fecha_venta": "2025-10-16", "total": 6200}
+    },
+    {
+        "model": "ventas.detalleventa",
+        "pk": 1,
+        "fields": {"venta": 1, "producto": 1, "cantidad": 1, "precio_unitario": 2000, "subtotal": 2000}
+    },
+    {
+        "model": "ventas.detalleventa",
+        "pk": 2,
+        "fields": {"venta": 1, "producto": 3, "cantidad": 1, "precio_unitario": 4200, "subtotal": 4200}
+    }
+]

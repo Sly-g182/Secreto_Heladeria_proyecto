@@ -1,0 +1,30 @@
+[
+    {
+        "model": "marketing.promocion",
+        "pk": 1,
+        "fields": {
+            "nombre": "Promo Verano Helados",
+            "descripcion": "15%% de descuento en helados",
+            "tipo": "PORCENTAJE",
+            "valor_descuento": 15,
+            "fecha_inicio": "2025-10-10",
+            "fecha_fin": "2025-12-31",
+            "activa": true,
+            "productos": [1, 2]
+        }
+    },
+    {
+        "model": "marketing.promocion",
+        "pk": 2,
+        "fields": {
+            "nombre": "Promo Chocolate Pastel",
+            "descripcion": "10%% de descuento en pasteles de chocolate",
+            "tipo": "PORCENTAJE",
+            "valor_descuento": 10,
+            "fecha_inicio": "2025-10-15",
+            "fecha_fin": "2025-11-30",
+            "activa": true,
+            "productos": [3]
+        }
+    }
+]
