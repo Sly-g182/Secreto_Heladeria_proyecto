@@ -1,4 +1,3 @@
-# clientes/models.py
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,6 +6,13 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=20, blank=True, null=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
     rut = models.CharField(max_length=15, blank=True, null=True)
+
+    # 🔗 Relación muchos-a-muchos hacia Promocion
+    promociones = models.ManyToManyField(
+        'marketing.Promocion',
+        blank=True,
+        related_name='clientes_beneficiados'  # ← SIN conflicto
+    )
 
     @property
     def correo(self):
@@ -20,3 +26,25 @@ class Cliente(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def promociones_vigentes(self):
+        from django.utils import timezone
+        from marketing.models import Promocion
+        hoy = timezone.now().date()
+
+        # Promociones personalizadas (asignadas al cliente)
+        personalizadas = self.promociones.filter(
+            activa=True,
+            fecha_inicio__lte=hoy,
+            fecha_fin__gte=hoy
+        )
+
+        # Promociones generales (válidas para todos)
+        generales = Promocion.objects.filter(
+            es_general=True,
+            activa=True,
+            fecha_inicio__lte=hoy,
+            fecha_fin__gte=hoy
+        )
+
+        return personalizadas.union(generales)

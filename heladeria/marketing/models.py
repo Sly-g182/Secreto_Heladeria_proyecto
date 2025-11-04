@@ -17,6 +17,9 @@ class Promocion(models.Model):
     fecha_fin = models.DateField()
     activa = models.BooleanField(default=False)
 
+    # 🔹 Si quieres distinguir las promociones generales (válidas para todos los clientes)
+    es_general = models.BooleanField(default=False)
+
     @property
     def es_vigente(self):
         from django.utils import timezone
@@ -25,3 +28,15 @@ class Promocion(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def clean(self):
+        """
+        Validación opcional: asegura coherencia según tipo de promoción.
+        """
+        from django.core.exceptions import ValidationError
+
+        if self.tipo == '2X1' and self.valor_descuento:
+            raise ValidationError({'valor_descuento': "Las promociones 2x1 no deben tener valor de descuento."})
+
+        if self.tipo in ['PORCENTAJE', 'VALOR_FIJO'] and not self.valor_descuento:
+            raise ValidationError({'valor_descuento': "Debes especificar un valor de descuento."})

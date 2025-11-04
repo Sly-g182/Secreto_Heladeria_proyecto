@@ -71,6 +71,19 @@ def editar_promocion(request, pk):
 
 @login_required
 @user_passes_test(is_staff_user, login_url='/')
+def eliminar_promocion(request, pk):
+    promocion = get_object_or_404(Promocion, pk=pk)
+    if request.method == 'POST':
+        nombre = promocion.nombre
+        promocion.delete()
+        messages.success(request, f"La promoción '{nombre}' fue eliminada correctamente.")
+        return redirect('marketing:marketing_dashboard')
+
+    return render(request, 'marketing/eliminar_promocion.html', {'promocion': promocion})
+
+
+@login_required
+@user_passes_test(is_staff_user, login_url='/')
 def reporte_clientes(request):
     if not request.user.is_staff:
         return render(request, "marketing/reporte_clientes.html", {"datos_clientes": [], "no_permitido": True})
