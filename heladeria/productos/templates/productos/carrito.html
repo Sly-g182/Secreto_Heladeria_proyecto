@@ -18,7 +18,16 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="mb-0 text-capitalize">{{ item.nombre }}</h6>
+
+                                {% if item.precio_unitario < item.precio_original %}
+                                <small class="text-muted">
+                                    <del>${{ item.precio_original|floatformat:0 }}</del>
+                                    <span class="text-success fw-bold"> ${{ item.precio_unitario|floatformat:0 }}</span>
+                                </small>
+                                {% else %}
                                 <small class="text-muted">Precio unitario: ${{ item.precio_unitario|floatformat:0 }}</small>
+                                {% endif %}
+
                             </div>
 
                             <div class="text-end">

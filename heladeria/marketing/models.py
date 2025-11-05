@@ -1,5 +1,6 @@
 from django.db import models
 from productos.models import Producto
+from clientes.models import Cliente
 
 TIPO_PROMOCION = [
     ('PORCENTAJE', 'Porcentaje'),
@@ -17,8 +18,13 @@ class Promocion(models.Model):
     fecha_fin = models.DateField()
     activa = models.BooleanField(default=False)
 
-    # 🔹 Si quieres distinguir las promociones generales (válidas para todos los clientes)
+    # 🔹 Promoción general o específica
     es_general = models.BooleanField(default=False)
+
+    # 🔹 Nueva relación: clientes específicos que obtienen esta promoción
+    clientes_beneficiados = models.ManyToManyField(Cliente, blank=True, related_name='promociones_beneficiadas')
+
+
 
     @property
     def es_vigente(self):
@@ -30,9 +36,7 @@ class Promocion(models.Model):
         return self.nombre
 
     def clean(self):
-        """
-        Validación opcional: asegura coherencia según tipo de promoción.
-        """
+        """Validaciones de coherencia según el tipo de promoción."""
         from django.core.exceptions import ValidationError
 
         if self.tipo == '2X1' and self.valor_descuento:

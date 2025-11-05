@@ -11,7 +11,7 @@ class Cliente(models.Model):
     promociones = models.ManyToManyField(
         'marketing.Promocion',
         blank=True,
-        related_name='clientes_beneficiados'  # ← SIN conflicto
+        related_name='clientes_asociados'  # ✅ Nombre único, sin conflictos
     )
 
     @property
@@ -28,6 +28,11 @@ class Cliente(models.Model):
         return self.nombre
 
     def promociones_vigentes(self):
+        """
+        Retorna las promociones activas que aplican a este cliente:
+        - Promociones asignadas directamente al cliente.
+        - Promociones generales (válidas para todos los clientes).
+        """
         from django.utils import timezone
         from marketing.models import Promocion
         hoy = timezone.now().date()
@@ -47,4 +52,5 @@ class Cliente(models.Model):
             fecha_fin__gte=hoy
         )
 
-        return personalizadas.union(generales)
+        # Unimos ambas y eliminamos duplicados
+        return (personalizadas | generales).distinct()

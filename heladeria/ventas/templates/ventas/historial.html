@@ -32,7 +32,11 @@
                         <div class="col-8">
                             <span class="fw-bold text-dark text-capitalize">{{ detalle.producto.nombre }}</span>
                             <small class="text-muted d-block">
-                                💵 ${{ detalle.precio_unitario|floatformat:0 }} c/u
+                                {% if detalle.precio_unitario < detalle.producto.precio %}
+                                    💵 <s>${{ detalle.producto.precio|floatformat:0 }}</s> → <span class="text-success">${{ detalle.precio_unitario|floatformat:0 }}</span> c/u
+                                {% else %}
+                                    💵 ${{ detalle.precio_unitario|floatformat:0 }} c/u
+                                {% endif %}
                             </small>
                         </div>
 
