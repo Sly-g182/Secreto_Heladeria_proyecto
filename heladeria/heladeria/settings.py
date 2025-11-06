@@ -20,14 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
 
-    # Apps propias
     'core',
     'clientes',
     'productos',
     'ventas',
     'marketing',
 
-    # Librerías externas
     'widget_tweaks',
 ]
 
@@ -54,7 +52,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.roles',  # o roles_usuario según tu código
+                'core.context_processors.roles',
             ],
         },
     },
@@ -97,18 +95,22 @@ LOGOUT_REDIRECT_URL = '/clientes/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuraciones de sesión
-# Duración de la cookie de sesión (en segundos)
-SESSION_COOKIE_AGE = 60 * 60 * 2  # 2 horas
-
-# ¿La sesión expira al cerrar el navegador?
+SESSION_COOKIE_AGE = 60 * 60 * 2
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-# Cada vez que se hace una petición, se actualiza la expiración
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = 'Lax'
 
-# Seguridad de las cookies
-SESSION_COOKIE_SECURE = False  # Solo en producción con HTTPS
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@heladeria.com'
 
-# Restricción SameSite (protección CSRF)
-SESSION_COOKIE_SAMESITE = 'Lax'  # Puede ser 'Lax', 'Strict' o 'None' (+ Secure)
+AUTH_PASSWORD_VALIDATORS += [
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
+    },
+]
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_PERMISSIONS = 0o644

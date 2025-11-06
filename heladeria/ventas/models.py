@@ -40,10 +40,10 @@ class DetalleVenta(models.Model):
         hoy = timezone.now().date()
         cliente = self.venta.cliente
 
-        # Precio base del producto
+        
         precio_base = Decimal(self.producto.precio)
 
-        # Buscar promociones vigentes aplicables (por producto o generales)
+        
         promociones = Promocion.objects.filter(
             activa=True,
             fecha_inicio__lte=hoy,
@@ -52,7 +52,7 @@ class DetalleVenta(models.Model):
             models.Q(productos=self.producto) | models.Q(productos__isnull=True)
         )
 
-        # Si hay cliente, incluir las que sean generales o asignadas a él
+        
         if cliente:
             promociones = promociones.filter(
                 models.Q(es_general=True) | models.Q(clientes_beneficiados=cliente)
@@ -60,7 +60,7 @@ class DetalleVenta(models.Model):
 
         mejor_precio = precio_base
 
-        # Aplicar la mejor promoción posible
+        
         for promo in promociones.distinct():
             precio_desc = precio_base
 
@@ -78,13 +78,13 @@ class DetalleVenta(models.Model):
             if precio_desc < mejor_precio:
                 mejor_precio = precio_desc
 
-        # Asignar valores finales
+        
         self.precio_unitario = mejor_precio.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         self.subtotal = (self.precio_unitario * self.cantidad).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
         super().save(*args, **kwargs)
 
-        # Actualizar stock correctamente
+        
         if nuevo:
             Producto.objects.filter(pk=self.producto_id).update(stock=F('stock') - self.cantidad)
         else:
@@ -93,5 +93,5 @@ class DetalleVenta(models.Model):
             if diferencia:
                 Producto.objects.filter(pk=self.producto_id).update(stock=F('stock') - diferencia)
 
-        # Recalcular total de la venta
+        
         self.venta.calcular_total()

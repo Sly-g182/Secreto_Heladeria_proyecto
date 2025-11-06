@@ -10,29 +10,36 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Dashboard de Marketing</h1>
         
-        <!-- Botón principal para crear promociones -->
-        <a href="{% url 'marketing:crear_promocion' %}" class="btn btn-success btn-lg shadow-sm">
-            <i class="fas fa-bullhorn"></i> Crear Nueva Promoción
-        </a>
+        <!-- Contenedor para ambos botones -->
+        <div class="d-flex gap-2">
+            <!-- Botón principal para crear promociones -->
+            <a href="{% url 'marketing:crear_promocion' %}" class="btn btn-success btn-lg shadow-sm">
+                <i class="fas fa-bullhorn"></i> Crear Nueva Promoción
+            </a>
+
+            <!-- Botón para crear campañas -->
+            <a href="{% url 'marketing:crear_campaña' %}" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-flag"></i> Crear Nueva Campaña
+            </a>
+        </div>
     </div>
 
-    <!-- Sección de Resumen General - AHORA CON ENLACES -->
+    <!-- Sección de Resumen General -->
     <div class="row mb-5">
         
-        <!-- 1. Clientes Registrados (Enlaza al reporte de clientes) -->
-<div class="col-md-3">
-    <a href="{% url 'marketing:reporte_clientes' %}" class="text-decoration-none">
-        <div class="card text-white bg-primary mb-3 shadow hover-zoom">
-            <div class="card-header">Clientes Registrados</div>
-            <div class="card-body">
-                <h2 class="card-title">{{ resumen.total_clientes|intcomma }}</h2>
-            </div>
+        <!-- 1. Clientes Registrados -->
+        <div class="col-md-3">
+            <a href="{% url 'marketing:reporte_clientes' %}" class="text-decoration-none">
+                <div class="card text-white bg-primary mb-3 shadow hover-zoom">
+                    <div class="card-header">Clientes Registrados</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ resumen.total_clientes|intcomma }}</h2>
+                    </div>
+                </div>
+            </a>
         </div>
-    </a>
-</div>
 
-        
-        <!-- 2. Ventas Totales (Enlaza al reporte de clientes por ahora, idealmente un reporte de ventas) -->
+        <!-- 2. Ventas Totales -->
         <div class="col-md-3">
             <a href="{% url 'marketing:reporte_clientes' %}" class="text-decoration-none">
                 <div class="card text-white bg-info mb-3 shadow hover-zoom">
@@ -43,8 +50,8 @@
                 </div>
             </a>
         </div>
-        
-        <!-- 3. Monto Total Vendido (Enlaza al reporte de clientes por ahora) -->
+
+        <!-- 3. Monto Total Vendido -->
         <div class="col-md-3">
             <a href="{% url 'marketing:reporte_clientes' %}" class="text-decoration-none">
                 <div class="card text-white bg-success mb-3 shadow hover-zoom">
@@ -55,8 +62,8 @@
                 </div>
             </a>
         </div>
-        
-        <!-- 4. Promociones Activas (Enlaza directamente a la tabla de promociones en esta misma página) -->
+
+        <!-- 4. Promociones Activas -->
         <div class="col-md-3">
             <a href="#promociones-activas-table" class="text-decoration-none">
                 <div class="card text-white bg-warning mb-3 shadow hover-zoom">
@@ -67,12 +74,24 @@
                 </div>
             </a>
         </div>
+
+        <!-- 5. Campañas Activas -->
+        <div class="col-md-3">
+            <a href="#campañas-activas-table" class="text-decoration-none">
+                <div class="card text-white bg-secondary mb-3 shadow hover-zoom">
+                    <div class="card-header">Campañas Activas</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ campañas_activas|intcomma }}</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <!-- Fila de Analíticas -->
     <div class="row">
         
-        <!-- Columna 1: Productos Más Vendidos (Insight para Ofertas) -->
+        <!-- Productos Más Vendidos -->
         <div class="col-md-6 mb-4">
             <div class="card shadow h-100">
                 <div class="card-header bg-dark text-white">
@@ -91,7 +110,7 @@
             </div>
         </div>
         
-        <!-- Columna 2: Productos por Vencer (Alerta de Inventario/Ofertas Rápidas) -->
+        <!-- Productos por Vencer -->
         <div class="col-md-6 mb-4">
             <div class="card shadow h-100">
                 <div class="card-header bg-danger text-white">
@@ -107,15 +126,11 @@
                     <li class="list-group-item text-center text-muted">¡Todo el inventario está fresco!</li>
                     {% endfor %}
                 </ul>
-                <div class="card-footer text-muted">
-                    
-                </div>
             </div>
         </div>
-        
     </div>
 
-    <!-- Sección de Últimas Compras (Para Seguimiento Rápido) -->
+    <!-- Últimas Compras -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="card shadow">
@@ -166,7 +181,7 @@
         </div>
     </div>
     
-    <!-- Sección Nueva: Listado Completo de Promociones (Destino del Enlace de Promociones Activas) -->
+    <!-- Todas las Promociones -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow" id="promociones-activas-table">
@@ -191,8 +206,8 @@
                                 {% now "Y-m-d" as today_date %}
                                 {% for promo in todas_promociones %}
                                 <tr class="
-                                    {% if promo.fecha_fin|date:"Y-m-d" < today_date %}table-secondary{% comment %} Vencida {% endcomment %}
-                                    {% elif promo.fecha_inicio|date:"Y-m-d" > today_date %}table-info{% comment %} Pendiente {% endcomment %}
+                                    {% if promo.fecha_fin|date:"Y-m-d" < today_date %}table-secondary
+                                    {% elif promo.fecha_inicio|date:"Y-m-d" > today_date %}table-info
                                     {% endif %}
                                 ">
                                     <td>#{{ promo.id }}</td>
@@ -216,14 +231,13 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'marketing:editar_promocion' pk=promo.id %}" class="btn btn-sm btn-primary" title="Editar Promoción">
+                                        <a href="{% url 'marketing:editar_promocion' pk=promo.id %}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
-                                        <a href="{% url 'marketing:eliminar_promocion' pk=promo.id %}" class="btn btn-danger btn-sm ms-2" title="Eliminar Promoción">
+                                        <a href="{% url 'marketing:eliminar_promocion' pk=promo.id %}" class="btn btn-danger btn-sm ms-2">
                                             <i class="fas fa-trash-alt"></i> Eliminar
                                         </a>
                                     </td>
-
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -237,11 +251,73 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Todas las Campañas -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow" id="campañas-activas-table">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-flag"></i> Todas las Campañas Creadas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Vigencia</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% now "Y-m-d" as today_date %}
+                                {% for campaña in todas_campañas %}
+                                <tr class="
+                                    {% if campaña.fecha_fin|date:"Y-m-d" < today_date %}table-secondary
+                                    {% elif campaña.fecha_inicio|date:"Y-m-d" > today_date %}table-info
+                                    {% endif %}
+                                ">
+                                    <td>#{{ campaña.id }}</td>
+                                    <td>{{ campaña.nombre }}</td>
+                                    <td>{{ campaña.categoria.nombre }}</td>
+                                    <td>{{ campaña.fecha_inicio|date:"d M" }} - {{ campaña.fecha_fin|date:"d M Y" }}</td>
+                                    <td>
+                                        {% if campaña.fecha_inicio|date:"Y-m-d" <= today_date and campaña.fecha_fin|date:"Y-m-d" >= today_date %}
+                                            <span class="badge bg-success">Activa</span>
+                                        {% elif campaña.fecha_inicio|date:"Y-m-d" > today_date %}
+                                            <span class="badge bg-info">Pendiente</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Vencida</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'marketing:editar_campaña' pk=campaña.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a href="{% url 'marketing:eliminar_campaña' pk=campaña.id %}" class="btn btn-danger btn-sm ms-2">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No hay campañas registradas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <style>
-/* Estilo para el efecto de zoom al pasar el ratón */
 .hover-zoom {
     transition: transform 0.3s ease-in-out;
 }
@@ -249,4 +325,5 @@
     transform: scale(1.05);
 }
 </style>
+
 {% endblock content %}

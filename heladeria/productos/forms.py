@@ -1,5 +1,5 @@
 from django import forms
-from .models import Cliente  
+from clientes.models import Cliente  
 from productos.models import Producto
 from marketing.models import Promocion
 

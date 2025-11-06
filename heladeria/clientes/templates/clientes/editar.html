@@ -1,51 +1,85 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block title %}Editar Perfil{% endblock title %}
 
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-8 col-sm-10">
-            <div class="card shadow-lg border-0">
-                
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-lg border-0 rounded-4">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3 class="mb-0">Editar Perfil</h3>
+                    <h3 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Editar Perfil</h3>
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="post" novalidate>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mt-2" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
 
+                        {# --- Vista previa de la imagen actual --- #}
+                        {% if cliente.imagen %}
+                            <div class="text-center mb-4">
+                                <img src="{{ cliente.imagen.url }}" alt="Imagen de perfil actual"
+                                        id="imagen-preview" class="rounded-circle shadow" width="150" height="150">
+                                <p class="mt-2 text-muted"></p>
+                            </div>
+                        {% else %}
+                            <div class="text-center mb-4">
+                                <img src="{% static 'img/default-avatar.jpg' %}" alt="Sin imagen"
+                                        id="imagen-preview" class="rounded-circle shadow" width="150" height="150">
+                                <p class="mt-2 text-muted"></p>
+                            </div>
+                        {% endif %}
+
+                        {# --- Campos del formulario --- #}
                         {% for field in form %}
                             <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}:</label>
+                                <label class="form-label">{{ field.label }}</label>
                                 {{ field|add_class:"form-control" }}
-                                
                                 {% for error in field.errors %}
-                                    <div class="alert alert-danger p-1 mt-1">{{ error }}</div>
+                                    <div class="alert alert-danger p-1 mt-2 mb-0">
+                                        <i class="bi bi-exclamation-triangle me-1"></i> {{ error }}
+                                    </div>
                                 {% endfor %}
                             </div>
                         {% endfor %}
 
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger mt-3">
                                 {% for error in form.non_field_errors %}
-                                    <p class="mb-0">{{ error }}</p>
+                                    <div><i class="bi bi-x-circle me-1"></i>{{ error }}</div>
                                 {% endfor %}
                             </div>
                         {% endif %}
 
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
-                        </div>
-                        
-                        <p class="text-center mt-3">
-                            <a href="{% url 'clientes:inicio' %}" class="text-decoration-none">
-                                <i class="bi bi-arrow-left"></i> Volver al inicio
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="{% url 'core:inicio' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
                             </a>
-                        </p>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Guardar cambios
+                            </button>
+                        </div>
                     </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <a href="{% url 'clientes:cambiar_password' %}" class="btn btn-warning btn-lg shadow-sm">
+                            <i class="bi bi-lock-fill me-1"></i> Cambiar contraseña
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

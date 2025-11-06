@@ -15,6 +15,9 @@
     <!-- Íconos Bootstrap -->
     <link rel="stylesheet" 
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
 
     <!-- 🌟 Estilos personalizados -->
     <style>
@@ -110,7 +113,7 @@
                     {% endif %}
                 </ul>
                 
-                <a href="{% url 'clientes:editar' %}" class="text-decoration-none">
+                <a href="{% url 'clientes:editar_perfil' %}" class="text-decoration-none">
                     <div class="d-flex align-items-center">
                         <div class="bg-light text-primary fw-semibold rounded-pill px-3 py-1 shadow-sm border border-2 border-primary me-3 user-pill">
                             {{ user.username }}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filters %}
+{% load humanize %}
 
 {% block title %}Tienda - Nuestros Productos{% endblock %}
 
@@ -10,24 +11,37 @@
 
     {# Alerta de promociones #}
     {% if promociones_por_producto %}
-        <div class="alert alert-danger text-center fw-bold shadow-sm">
-            🎉 ¡OFERTAS ACTIVAS! Busca el descuento en la tarjeta del producto.
+        <div class="alert alert-danger text-center fw-bold shadow-sm mb-4">
+            ¡OFERTAS ACTIVAS! Busca el descuento en la tarjeta del producto.
         </div>
     {% endif %}
 
     {# Categorías y productos #}
     {% if categorias %}
         {% for categoria_nombre, productos_lista in categorias %}
+
             <h2 class="mt-5 mb-3 text-dark border-bottom pb-2">{{ categoria_nombre }}</h2>
 
             <div class="row">
                 {% if productos_lista %}
                     {% for producto in productos_lista %}
                         {% with promos=promociones_por_producto|get_item:producto.id %}
+                        {% with precio=precios_con_descuento|get_item:producto.id %}
                         <div class="col-md-4 col-sm-6 mb-4">
                             <div class="card h-100 shadow-sm {% if promos %}border-danger border-2{% endif %}">
                                 <div class="card-body d-flex flex-column">
+
                                     <h5 class="card-title text-capitalize">{{ producto.nombre }}</h5>
+
+                                    {# Mostrar promociones si existen #}
+                                    {% if promos %}
+                                        {% for promo in promos %}
+                                            <span class="badge bg-danger mb-2">{{ promo.nombre }} 
+                                                {% if promo.tipo == 'PORCENTAJE' %}{{ promo.descuento|floatformat:0 }}% OFF{% elif promo.tipo == 'VALOR_FIJO' %}${{ promo.descuento|floatformat:0 }}{% elif promo.tipo == '2X1' %}2x1{% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+
                                     <p class="card-text text-muted small">
                                         {{ producto.descripcion|default:"Delicioso producto artesanal." }}
                                     </p>
@@ -35,16 +49,14 @@
                                     <div class="mt-auto pt-3">
                                         {% if promos %}
                                             <p class="mb-1">
-                                                Precio Normal: <s class="text-muted">${{ producto.precio|floatformat:0 }}</s>
+                                                Precio Original: <s class="text-muted">${{ precio.precio_original|floatformat:0 }}</s>
                                             </p>
-                                            {% for promo in promos %}
-                                                <p class="text-danger fs-5 fw-bold">
-                                                    <span class="badge bg-danger ms-2">{{ promo.descuento|floatformat:0 }}% OFF</span>
-                                                </p>
-                                            {% endfor %}
+                                            <p class="text-primary fs-5 fw-bold">
+                                                Precio Final: ${{ precio.precio_unitario|floatformat:0 }}
+                                            </p>
                                         {% else %}
                                             <p class="text-primary fs-5 fw-bold">
-                                                Precio: ${{ producto.precio|floatformat:0 }}
+                                                Precio: ${{ precio.precio_unitario|floatformat:0 }}
                                             </p>
                                         {% endif %}
                                     </div>
@@ -67,9 +79,11 @@
                                             Inicia Sesión para Comprar
                                         </a>
                                     {% endif %}
+
                                 </div>
                             </div>
                         </div>
+                        {% endwith %}
                         {% endwith %}
                     {% endfor %}
                 {% else %}
@@ -83,4 +97,13 @@
         <p class="text-center text-danger">Actualmente, no hay productos disponibles en stock para mostrar.</p>
     {% endif %}
 </div>
+
+<style>
+.hover-zoom {
+    transition: transform 0.3s ease-in-out;
+}
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+</style>
 {% endblock %}

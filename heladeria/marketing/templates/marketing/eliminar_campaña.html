@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Campaña{% endblock title %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="card shadow-lg p-4 mx-auto" style="max-width: 600px;">
+        <h2 class="mb-4 text-danger"><i class="fas fa-trash-alt"></i> Eliminar campaña</h2>
+        <p class="fs-5">¿Seguro que deseas eliminar la campaña <strong>{{ campaña.nombre }}</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg me-2">Sí, eliminar</button>
+            <a href="{% url 'marketing:marketing_dashboard' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

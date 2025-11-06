@@ -5,13 +5,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from datetime import date, timedelta
 from django.db.models import Sum, Count, Subquery, OuterRef
-from django.db import models
 
 from clientes.models import Cliente
-from productos.models import Producto
-from .models import Promocion
+from productos.models import Producto, Categoria
+from .models import Promocion, Campaña
 from ventas.models import Venta, DetalleVenta
-from .forms import PromocionForm
+from .forms import PromocionForm, CampañaForm
 
 
 # ------------------------------
@@ -34,6 +33,7 @@ def marketing_dashboard(request):
         'total_ventas': Venta.objects.count(),
         'total_productos': Producto.objects.count(),
         'promociones_activas': Promocion.objects.filter(activa=True, fecha_fin__gte=hoy).count(),
+        'campañas_activas': Campaña.objects.filter(activa=True, fecha_fin__gte=hoy).count(),
         'ventas_total_monto': Venta.objects.aggregate(total=Sum('total'))['total'] or 0,
     }
 
@@ -62,6 +62,7 @@ def marketing_dashboard(request):
     )
 
     todas_promociones = Promocion.objects.all().order_by('-fecha_inicio')
+    todas_campañas = Campaña.objects.all().order_by('-fecha_inicio')
 
     return render(request, 'marketing/dashboard.html', {
         'resumen': resumen,
@@ -69,6 +70,7 @@ def marketing_dashboard(request):
         'productos_mas_vendidos': productos_mas_vendidos,
         'productos_por_vencer': productos_por_vencer,
         'todas_promociones': todas_promociones,
+        'todas_campañas': todas_campañas,
     })
 
 
@@ -138,6 +140,72 @@ def eliminar_promocion(request, pk):
         return redirect('marketing:marketing_dashboard')
 
     return render(request, 'marketing/eliminar_promocion.html', {'promocion': promocion})
+
+
+# ------------------------------
+# 🟢 CREAR CAMPAÑA
+# ------------------------------
+@login_required
+@user_passes_test(is_staff_user, login_url='/')
+def crear_campaña(request):
+    if request.method == 'POST':
+        form = CampañaForm(request.POST)
+        if form.is_valid():
+            campaña = form.save()
+            messages.success(request, f"✅ Campaña '{campaña.nombre}' creada exitosamente.")
+            return redirect('marketing:marketing_dashboard')
+        messages.error(request, "❌ Error al crear campaña.")
+    else:
+        form = CampañaForm()
+
+    campañas_activas = Campaña.objects.filter(activa=True, fecha_fin__gte=date.today())
+    return render(request, 'marketing/crear_campaña.html', {
+        'form': form,
+        'modo': 'Crear',
+        'campañas_activas': campañas_activas,
+    })
+
+
+# ------------------------------
+# ✏️ EDITAR CAMPAÑA
+# ------------------------------
+@login_required
+@user_passes_test(is_staff_user, login_url='/')
+def editar_campaña(request, pk):
+    campaña = get_object_or_404(Campaña, pk=pk)
+
+    if request.method == 'POST':
+        form = CampañaForm(request.POST, instance=campaña)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"✏️ Campaña '{campaña.nombre}' actualizada.")
+            return redirect('marketing:marketing_dashboard')
+        messages.error(request, "❌ Error al actualizar campaña.")
+    else:
+        form = CampañaForm(instance=campaña)
+
+    return render(request, 'marketing/crear_campaña.html', {
+        'form': form,
+        'campaña': campaña,
+        'modo': 'Editar',
+    })
+
+
+# ------------------------------
+# 🗑️ ELIMINAR CAMPAÑA
+# ------------------------------
+@login_required
+@user_passes_test(is_staff_user, login_url='/')
+def eliminar_campaña(request, pk):
+    campaña = get_object_or_404(Campaña, pk=pk)
+
+    if request.method == 'POST':
+        nombre = campaña.nombre
+        campaña.delete()
+        messages.success(request, f"🗑️ La campaña '{nombre}' fue eliminada correctamente.")
+        return redirect('marketing:marketing_dashboard')
+
+    return render(request, 'marketing/eliminar_campaña.html', {'campaña': campaña})
 
 
 # ------------------------------

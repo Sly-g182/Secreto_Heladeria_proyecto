@@ -10,6 +10,9 @@ from .models import Producto
 from clientes.models import Cliente
 from ventas.models import Venta, DetalleVenta
 
+from marketing.models import Campaña
+
+
 
 def producto_listado(request):
     """Muestra productos en stock con promociones aplicadas."""
