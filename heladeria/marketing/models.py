@@ -1,14 +1,16 @@
 from django.db import models
-from productos.models import Producto
-from clientes.models import Cliente
-from productos.models import Categoria  # asumimos que tienes modelo Categoria
+from django.core.exceptions import ValidationError
 from django.utils import timezone
+from productos.models import Producto, Categoria
+from clientes.models import Cliente
+
 
 TIPO_PROMOCION = [
     ('PORCENTAJE', 'Porcentaje'),
     ('VALOR_FIJO', 'Valor Fijo'),
     ('2X1', '2x1'),
 ]
+
 
 class Promocion(models.Model):
     nombre = models.CharField(max_length=100)
@@ -23,37 +25,49 @@ class Promocion(models.Model):
     # 🔹 Promoción general o específica
     es_general = models.BooleanField(default=False)
 
-    # 🔹 Nueva relación: clientes específicos que obtienen esta promoción
-    clientes_beneficiados = models.ManyToManyField(Cliente, blank=True, related_name='promociones_beneficiadas')
-
-
+    # 🔹 Clientes específicos que obtienen esta promoción
+    clientes_beneficiados = models.ManyToManyField(
+        Cliente,
+        blank=True,
+        related_name='promociones_beneficiadas'
+    )
 
     @property
     def es_vigente(self):
-        from django.utils import timezone
-        hoy = timezone.now().date()
+        hoy = timezone.localdate()
         return self.activa and self.fecha_inicio <= hoy <= self.fecha_fin
 
     def __str__(self):
         return self.nombre
 
     def clean(self):
-        """Validaciones de coherencia según el tipo de promoción."""
-        from django.core.exceptions import ValidationError
-
+        """Validaciones de coherencia de fechas y tipo de promoción."""
+        # Validaciones específicas de tipo
         if self.tipo == '2X1' and self.valor_descuento:
             raise ValidationError({'valor_descuento': "Las promociones 2x1 no deben tener valor de descuento."})
 
         if self.tipo in ['PORCENTAJE', 'VALOR_FIJO'] and not self.valor_descuento:
             raise ValidationError({'valor_descuento': "Debes especificar un valor de descuento."})
 
+        # Validaciones de fecha
+        hoy = timezone.localdate()
+
+        # Solo validar si las fechas existen
+        if self.fecha_inicio and self.fecha_inicio < hoy:
+            raise ValidationError({'fecha_inicio': "La fecha de inicio no puede ser anterior a hoy."})
+
+        if self.fecha_inicio and self.fecha_fin and self.fecha_fin < self.fecha_inicio:
+            raise ValidationError({'fecha_fin': "La fecha de fin no puede ser anterior a la fecha de inicio."})
 
 
-
-class Campaña(models.Model):
+class Campana(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='campañas')
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.CASCADE,
+        related_name='campanas'
+    )
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     activa = models.BooleanField(default=False)
@@ -63,20 +77,25 @@ class Campaña(models.Model):
 
     class Meta:
         ordering = ['-fecha_inicio']
-        verbose_name = "Campaña"
-        verbose_name_plural = "Campañas"
+        verbose_name = "Campana"
+        verbose_name_plural = "Campanas"
 
     def __str__(self):
         return f"{self.nombre} ({self.categoria.nombre})"
 
     @property
     def es_vigente(self):
-        """Retorna True si la campaña está activa y dentro de fechas."""
-        hoy = timezone.now().date()
+        """Retorna True si la campaña está activa y dentro de las fechas."""
+        hoy = timezone.localdate()
         return self.activa and self.fecha_inicio <= hoy <= self.fecha_fin
 
     def clean(self):
-        """Validación: la fecha de fin no puede ser anterior a la fecha de inicio."""
-        from django.core.exceptions import ValidationError
-        if self.fecha_fin < self.fecha_inicio:
+        """Validaciones de fechas."""
+        hoy = timezone.localdate()
+
+        # Solo validar si las fechas están definidas
+        if self.fecha_inicio and self.fecha_inicio < hoy:
+            raise ValidationError({'fecha_inicio': "La fecha de inicio no puede ser anterior a hoy."})
+
+        if self.fecha_inicio and self.fecha_fin and self.fecha_fin < self.fecha_inicio:
             raise ValidationError({'fecha_fin': "La fecha de fin no puede ser anterior a la fecha de inicio."})

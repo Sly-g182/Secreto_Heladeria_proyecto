@@ -2,12 +2,17 @@
     {
         "model": "auth.group",
         "pk": 1,
-        "fields": {"name": "Marketing"}
+        "fields": {
+            "name": "Marketing",
+            "permissions": [49, 50, 51, 52, 40, 28]
+        }
     },
     {
         "model": "auth.group",
         "pk": 2,
-        "fields": {"name": "Cliente"}
+        "fields": {
+            "name": "Cliente"
+        }
     },
     {
         "model": "auth.user",
@@ -38,13 +43,61 @@
         }
     },
     {
+        "model": "auth.user",
+        "pk": 3,
+        "fields": {
+            "username": "Camila",
+            "password": "pbkdf2_sha256$260000$A9d1Vl9x4Y3z$j+D7Uj6O2v5g2T9M0jG9w7s4z8w4H1p6V3q4X1e9N2o=",
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "email": "camila@gmail.com",
+            "groups": [2],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "username": "Ignacio",
+            "password": "pbkdf2_sha256$260000$A9d1Vl9x4Y3z$j+D7Uj6O2v5g2T9M0jG9w7s4z8w4H1p6V3q4X1e9N2o=",
+            "is_superuser": false,
+            "is_staff": false,
+            "is_active": true,
+            "email": "ignacio@gmail.com",
+            "groups": [2],
+            "user_permissions": []
+        }
+    },
+    {
         "model": "clientes.cliente",
         "pk": 1,
         "fields": {
             "user": 2,
             "rut": "12345678-9",
             "telefono": "987654321",
-            "direccion": "Calle Falsa 123"
+            "direccion": "Av. Francisco de Aguirre 345, La Serena"
+        }
+    },
+    {
+        "model": "clientes.cliente",
+        "pk": 2,
+        "fields": {
+            "user": 3,
+            "rut": "19283746-5",
+            "telefono": "956482713",
+            "direccion": "Av. del Mar 2400, La Serena"
+        }
+    },
+    {
+        "model": "clientes.cliente",
+        "pk": 3,
+        "fields": {
+            "user": 4,
+            "rut": "17456382-1",
+            "telefono": "987120345",
+            "direccion": "Calle Los Perales 110, La Serena"
         }
     }
 ]

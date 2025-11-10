@@ -7,20 +7,84 @@
 {% block content %}
 <div class="container mt-5">
 
-    <h1 class="mb-4 text-center text-secondary">¡Elige tu Sabor Secreto!</h1>
+    <h1 class="mb-4 text-center" style="color:#d17ba2; font-weight:700;">
+        🍨 ¡Elige tu Sabor Secreto!
+    </h1>
 
-    {# Alerta de promociones #}
     {% if promociones_por_producto %}
-        <div class="alert alert-danger text-center fw-bold shadow-sm mb-4">
-            ¡OFERTAS ACTIVAS! Busca el descuento en la tarjeta del producto.
+        <div class="alert text-center fw-bold shadow-sm mb-4" 
+             style="background-color:#ffe1ec; color:#b0005a; border: 1px solid #f4b9cf;">
+            💖 ¡OFERTAS ACTIVAS! Busca el descuento en la tarjeta del producto.
         </div>
     {% endif %}
 
-    {# Categorías y productos #}
+    {# --- BUSCADOR, FILTRO, ORDEN Y PAGINADO --- #}
+    <form method="get" class="row mb-4 g-2 align-items-center justify-content-center" 
+          style="background-color:#fff8fa; border-radius:20px; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.05);">
+
+        <div class="col-md-3">
+            <input type="text" name="q" value="{{ query }}" class="form-control"
+                   placeholder="Buscar por nombre, precio o stock..."
+                   style="border-radius:15px; border-color:#f7c6d9;">
+        </div>
+
+
+          <div class="col-md-2 text-center">
+            <div class="form-check d-flex align-items-center justify-content-center">
+                <input class="form-check-input me-2" type="checkbox" name="promos" value="1"
+                       id="filtroPromos" {% if solo_promos %}checked{% endif %}>
+                <label class="form-check-label small" for="filtroPromos" style="color:#b35b84;">
+                    Solo en promoción 💝
+                </label>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-3">
+            <select name="categoria" class="form-select" style="border-radius:15px; border-color:#f7c6d9;">
+                <option value="">Todas las categorías</option>
+                {% for cat in categorias_disponibles %}
+                    <option value="{{ cat }}" {% if cat in categorias_filtradas %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select name="orden" class="form-select" style="border-radius:15px; border-color:#f7c6d9;">
+                <option value="">Ordenar por...</option>
+                <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre (A-Z)</option>
+                <option value="-nombre" {% if orden == '-nombre' %}selected{% endif %}>Nombre (Z-A)</option>
+                <option value="precio" {% if orden == 'precio' %}selected{% endif %}>Precio (menor a mayor)</option>
+                <option value="-precio" {% if orden == '-precio' %}selected{% endif %}>Precio (mayor a menor)</option>
+                <option value="stock" {% if orden == 'stock' %}selected{% endif %}>Stock (menor a mayor)</option>
+                <option value="-stock" {% if orden == '-stock' %}selected{% endif %}>Stock (mayor a menor)</option>
+            </select>
+        </div>
+
+
+        <div class="col-md-2">
+            <select name="per_page" class="form-select" style="border-radius:15px; border-color:#f7c6d9;" onchange="this.form.submit()">
+                <option value="5" {% if per_page == 5 %}selected{% endif %}>5 por página</option>
+                <option value="15" {% if per_page == 15 %}selected{% endif %}>15 por página</option>
+                <option value="30" {% if per_page == 30 %}selected{% endif %}>30 por página</option>
+            </select>
+        </div>
+
+        <div class="col-md-1">
+            <button type="submit" class="btn w-100"
+                    style="background-color:#d17ba2; color:white; border:none; border-radius:15px;">
+                Aplicar
+            </button>
+        </div>
+    </form>
+
+    {# --- PRODUCTOS AGRUPADOS POR CATEGORÍA --- #}
     {% if categorias %}
         {% for categoria_nombre, productos_lista in categorias %}
-
-            <h2 class="mt-5 mb-3 text-dark border-bottom pb-2">{{ categoria_nombre }}</h2>
+            <h2 class="mt-5 mb-3" style="color:#b35b84; font-weight:600; border-bottom:2px solid #f8bfd1;">
+                {{ categoria_nombre }}
+            </h2>
 
             <div class="row">
                 {% if productos_lista %}
@@ -28,58 +92,76 @@
                         {% with promos=promociones_por_producto|get_item:producto.id %}
                         {% with precio=precios_con_descuento|get_item:producto.id %}
                         <div class="col-md-4 col-sm-6 mb-4">
-                            <div class="card h-100 shadow-sm {% if promos %}border-danger border-2{% endif %}">
-                                <div class="card-body d-flex flex-column">
+                            <div class="card h-100 shadow-sm hover-zoom" 
+                                 style="border:none; border-radius:20px; overflow:hidden; background-color:#fffafc;">
+                                <div class="card-body d-flex flex-column text-center p-4">
 
-                                    <h5 class="card-title text-capitalize">{{ producto.nombre }}</h5>
+                                    <h5 class="card-title text-capitalize mb-2" 
+                                        style="color:#b35b84; font-weight:600;">{{ producto.nombre }}</h5>
 
-                                    {# Mostrar promociones si existen #}
                                     {% if promos %}
                                         {% for promo in promos %}
-                                            <span class="badge bg-danger mb-2">{{ promo.nombre }} 
-                                                {% if promo.tipo == 'PORCENTAJE' %}{{ promo.descuento|floatformat:0 }}% OFF{% elif promo.tipo == 'VALOR_FIJO' %}${{ promo.descuento|floatformat:0 }}{% elif promo.tipo == '2X1' %}2x1{% endif %}
+                                            <span class="badge mb-2" 
+                                                  style="background-color:#f78bb0; color:white; border-radius:10px; padding:5px 10px;">
+                                                {{ promo.nombre }}
+                                                {% if promo.tipo == 'PORCENTAJE' %}
+                                                    {{ promo.descuento|floatformat:0 }}% OFF
+                                                {% elif promo.tipo == 'VALOR_FIJO' %}
+                                                    -${{ promo.descuento|floatformat:0 }}
+                                                {% elif promo.tipo == '2X1' %}
+                                                    2x1
+                                                {% endif %}
                                             </span>
                                         {% endfor %}
                                     {% endif %}
 
-                                    <p class="card-text text-muted small">
-                                        {{ producto.descripcion|default:"Delicioso producto artesanal." }}
+                                    <p class="card-text text-muted small mb-3">
+                                        {{ producto.descripcion|default:"Delicioso producto artesanal con amor 💕." }}
                                     </p>
 
-                                    <div class="mt-auto pt-3">
+                                    <div class="mt-auto">
                                         {% if promos %}
-                                            <p class="mb-1">
-                                                Precio Original: <s class="text-muted">${{ precio.precio_original|floatformat:0 }}</s>
+                                            <p class="mb-1" style="color:#888;">
+                                                Precio Original:
+                                                <s>${{ precio.precio_original|floatformat:0|intcomma }}</s>
                                             </p>
-                                            <p class="text-primary fs-5 fw-bold">
-                                                Precio Final: ${{ precio.precio_unitario|floatformat:0 }}
+                                            <p class="fw-bold fs-5" style="color:#f15c9e;">
+                                                Precio Final: ${{ precio.precio_unitario|floatformat:0|intcomma }}
                                             </p>
                                         {% else %}
-                                            <p class="text-primary fs-5 fw-bold">
-                                                Precio: ${{ precio.precio_unitario|floatformat:0 }}
+                                            <p class="fw-bold fs-5" style="color:#f15c9e;">
+                                                Precio: ${{ precio.precio_unitario|floatformat:0|intcomma }}
                                             </p>
                                         {% endif %}
                                     </div>
 
                                     {% if user.is_authenticated %}
                                         {% if producto.stock > 0 %}
-                                            <form action="{% url 'productos:agregar_a_carrito' producto.id %}" method="post" class="mt-2">
+                                            <form action="{% url 'productos:agregar_a_carrito' producto.id %}" 
+                                                  method="post" class="mt-2">
                                                 {% csrf_token %}
-                                                <label for="id_cantidad_{{ producto.id }}" class="form-label small">
+                                                <label class="form-label small text-muted">
                                                     Cantidad (Stock: {{ producto.stock }})
                                                 </label>
-                                                <input type="number" name="cantidad" id="id_cantidad_{{ producto.id }}" value="1" min="1" max="{{ producto.stock }}" class="form-control form-control-sm mb-2" required>
-                                                <button type="submit" class="btn btn-primary w-100">Añadir al Carrito</button>
+                                                <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}" 
+                                                       class="form-control form-control-sm mb-2" 
+                                                       style="border-radius:10px; border-color:#f7c6d9;" required>
+                                                <button type="submit" class="btn w-100"
+                                                        style="background-color:#d17ba2; color:white; border:none; border-radius:15px;">
+                                                    Añadir al Carrito
+                                                </button>
                                             </form>
                                         {% else %}
-                                            <button class="btn btn-secondary w-100 mt-2" disabled>Agotado</button>
+                                            <button class="btn w-100 mt-2" style="background-color:#f3cbdc; border:none;" disabled>
+                                                Agotado
+                                            </button>
                                         {% endif %}
                                     {% else %}
-                                        <a href="{% url 'clientes:login' %}" class="btn btn-success w-100 mt-2">
+                                        <a href="{% url 'clientes:login' %}" class="btn w-100 mt-2"
+                                           style="background-color:#a7e0da; color:white; border:none; border-radius:15px;">
                                             Inicia Sesión para Comprar
                                         </a>
                                     {% endif %}
-
                                 </div>
                             </div>
                         </div>
@@ -88,22 +170,69 @@
                     {% endfor %}
                 {% else %}
                     <div class="col-12">
-                        <p class="text-center text-info">No hay productos disponibles en esta categoría en este momento.</p>
+                        <p class="text-center text-info">
+                            No hay productos disponibles en esta categoría.
+                        </p>
                     </div>
                 {% endif %}
             </div>
+
+            {# --- PAGINADOR POR CATEGORÍA (solo abajo) --- #}
+            {% if productos_lista.paginator.num_pages > 1 %}
+                <div class="d-flex justify-content-center mt-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if productos_lista.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link pastel-link"
+                                       href="?page_{{ categoria_nombre }}={{ productos_lista.previous_page_number }}&q={{ query }}&orden={{ orden }}&dir={{ dir }}&categoria={{ categorias_filtradas|join:',' }}&per_page={{ per_page }}">
+                                        ← Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in productos_lista.paginator.page_range %}
+                                {% if num == productos_lista.number %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > productos_lista.number|add:'-3' and num < productos_lista.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link pastel-link"
+                                           href="?page_{{ categoria_nombre }}={{ num }}&q={{ query }}&orden={{ orden }}&dir={{ dir }}&categoria={{ categorias_filtradas|join:',' }}&per_page={{ per_page }}">
+                                           {{ num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if productos_lista.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link pastel-link"
+                                       href="?page_{{ categoria_nombre }}={{ productos_lista.next_page_number }}&q={{ query }}&orden={{ orden }}&dir={{ dir }}&categoria={{ categorias_filtradas|join:',' }}&per_page={{ per_page }}">
+                                        Siguiente →
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
         {% endfor %}
     {% else %}
-        <p class="text-center text-danger">Actualmente, no hay productos disponibles en stock para mostrar.</p>
+        <p class="text-center text-danger">
+            No hay productos disponibles actualmente 🍰.
+        </p>
     {% endif %}
 </div>
 
 <style>
-.hover-zoom {
-    transition: transform 0.3s ease-in-out;
-}
-.hover-zoom:hover {
-    transform: scale(1.05);
+.hover-zoom { transition: transform 0.3s ease-in-out; }
+.hover-zoom:hover { transform: scale(1.04); }
+.pastel-link { color: #d17ba2; }
+.pastel-link:hover { color: #f15c9e; }
+.pagination .page-item.active .page-link {
+    background-color: #d17ba2;
+    border-color: #d17ba2;
+    color: white !important;
 }
 </style>
 {% endblock %}

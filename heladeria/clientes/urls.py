@@ -12,4 +12,6 @@ urlpatterns = [
     path('editar/', views.editar_perfil, name='editar_perfil'),
     path('reporte/', views.reporte_clientes, name='reporte_clientes'),
     path('cambiar-password/', views.cambiar_password, name='cambiar_password'),
+    path('reporte/exportar/', views.exportar_clientes_excel, name='exportar_clientes_excel'),
+
 ]

@@ -1,73 +1,98 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% load humanize %} 
+{% load humanize %}
 
 {% block title %}{{ modo }} Campaña{% endblock title %}
 
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            
-            <nav aria-label="breadcrumb">
+        <div class="col-lg-8">
+
+            <!-- 🔹 Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'marketing:marketing_dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ modo }} Campaña</li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'marketing:marketing_dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {{ modo }} Campaña
+                    </li>
                 </ol>
             </nav>
-            
-            <h1 class="mb-4">
-                <i class="fas fa-flag"></i> {{ modo }} Campaña
-                {% if modo == 'Editar' %}
-                    <small class="text-muted fs-5"> - {{ campaña.nombre }}</small>
+
+            <!-- 🔹 Título -->
+            <div class="d-flex align-items-center mb-4">
+                <h1 class="me-2 mb-0">
+                    <i class="fas fa-flag"></i> {{ modo }} Campaña
+                </h1>
+                {% if modo == "Editar" and campana %}
+                    <small class="text-muted fs-5">– {{ campana.nombre }}</small>
                 {% endif %}
-            </h1>
-            
-            <div class="card shadow-lg border-{{ modo|lower|slice:':4'|default:'info' }}">
-                <div class="card-body">
-                    
+            </div>
+
+            <!-- 🔹 Formulario -->
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
                     <form method="post"
-                            {% if modo == 'Editar' %}
-                            action="{% url 'marketing:editar_campaña' pk=campaña.id %}"
-                            {% else %}
-                            action="{% url 'marketing:crear_campaña' %}"
-                            {% endif %}>
-                            {% csrf_token %}
-                        
+                        {% if modo == "Editar" %}
+                            action="{% url 'marketing:editar_campana' pk=campana.id %}"
+                        {% else %}
+                            action="{% url 'marketing:crear_campana' %}"
+                        {% endif %}
+                    >
+                        {% csrf_token %}
+
+                        <!-- Nombre -->
                         <div class="mb-3">
-                            <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">Nombre</label>
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label fw-semibold">
+                                Nombre
+                            </label>
                             {% render_field form.nombre class="form-control" placeholder="Ej: Campaña Verano 2025" %}
                             {% for error in form.nombre.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
+                        <!-- Descripción -->
                         <div class="mb-3">
-                            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-bold">Descripción</label>
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+                                Descripción
+                            </label>
                             {% render_field form.descripcion class="form-control" rows="3" placeholder="Detalles de la campaña" %}
                             {% for error in form.descripcion.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
+                        <!-- Categoría -->
                         <div class="mb-3">
-                            <label for="{{ form.categoria.id_for_label }}" class="form-label fw-bold">Categoría</label>
+                            <label for="{{ form.categoria.id_for_label }}" class="form-label fw-semibold">
+                                Categoría
+                            </label>
                             {% render_field form.categoria class="form-select" %}
                             {% for error in form.categoria.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
+                        <!-- Fechas -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-bold">Fecha de Inicio</label>
+                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-semibold">
+                                    Fecha de Inicio
+                                </label>
                                 {% render_field form.fecha_inicio class="form-control" type="date" %}
                                 {% for error in form.fecha_inicio.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-bold">Fecha de Fin</label>
+                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-semibold">
+                                    Fecha de Fin
+                                </label>
                                 {% render_field form.fecha_fin class="form-control" type="date" %}
                                 {% for error in form.fecha_fin.errors %}
                                     <div class="text-danger small">{{ error }}</div>
@@ -75,9 +100,10 @@
                             </div>
                         </div>
 
+                        <!-- Estado -->
                         <div class="form-check mb-4">
                             {% render_field form.activa class="form-check-input" %}
-                            <label class="form-check-label fw-bold" for="{{ form.activa.id_for_label }}">
+                            <label class="form-check-label fw-semibold" for="{{ form.activa.id_for_label }}">
                                 Activar Campaña
                             </label>
                             {% for error in form.activa.errors %}
@@ -85,22 +111,28 @@
                             {% endfor %}
                         </div>
 
+                        <!-- Botón -->
                         <button type="submit" class="btn btn-primary w-100 btn-lg">
                             <i class="fas fa-save"></i> {{ modo }} Campaña
                         </button>
                     </form>
                 </div>
             </div>
-            
-            {% if modo == 'Crear' %}
+
+            <!-- 🔹 Campañas activas (solo al crear) -->
+            {% if modo == "Crear" %}
             <div class="mt-5">
-                <h4 class="text-secondary border-bottom pb-2">Campañas Activas (Referencia Rápida)</h4>
-                {% if campañas_activas %}
-                    <ul class="list-group shadow-sm">
-                        {% for camp in campañas_activas %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">
+                <h4 class="text-secondary border-bottom pb-2">
+                    Campañas Activas (Referencia Rápida)
+                </h4>
+
+                {% if campanas_activas %}
+                    <ul class="list-group shadow-sm mt-3">
+                        {% for camp in campanas_activas %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ camp.nombre }}</strong> ({{ camp.categoria.nombre }})
+                                    <strong>{{ camp.nombre }}</strong>
+                                    <span class="text-muted">({{ camp.categoria.nombre }})</span>
                                 </div>
                                 <span class="badge bg-primary rounded-pill">
                                     Finaliza: {{ camp.fecha_fin|date:"d/m/Y" }}
@@ -109,7 +141,7 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p class="text-muted">No hay campañas activas en este momento.</p>
+                    <p class="text-muted mt-3">No hay campañas activas en este momento.</p>
                 {% endif %}
             </div>
             {% endif %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Campañas Activas{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-primary"><i class="fas fa-bullhorn"></i> Campañas Activas</h1>
+
+    {% for campana, productos in campanas_con_productos %}
+    <div class="card shadow mb-4 border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ campana.nombre }}</h4>
+        </div>
+        <div class="card-body">
+            <p class="mb-1 text-muted"><strong>Categoría:</strong> {{ campana.categoria.nombre }}</p>
+            <p class="mb-2">{{ campana.descripcion }}</p>
+            <p><small>Válida desde {{ campana.fecha_inicio }} hasta {{ campana.fecha_fin }}</small></p>
+
+            <hr>
+            <h5 class="text-secondary">Productos de esta campaña:</h5>
+
+            {% if productos %}
+                <div class="row mt-3">
+                    {% for producto in productos %}
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card h-100 shadow-sm border-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ producto.nombre }}</h6>
+                                    <p class="card-text text-muted mb-1">Precio: ${{ producto.precio }}</p>
+                                    <p class="card-text text-muted">Stock: {{ producto.stock }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted fst-italic">No hay productos disponibles en esta categoría.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No hay campañas activas en este momento.</p>
+    {% endfor %}
+</div>
+{% endblock %}

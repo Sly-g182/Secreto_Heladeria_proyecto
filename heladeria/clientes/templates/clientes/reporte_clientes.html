@@ -35,13 +35,16 @@
                 <h5 class="mb-0 fw-semibold">
                     <i class="bi bi-clipboard-data me-2"></i> Listado General de Clientes
                 </h5>
-                <form method="get" class="d-flex">
-                    <input type="text" name="q" class="form-control form-control-sm me-2 rounded-pill"
-                            placeholder="Buscar cliente..." value="{{ request.GET.q }}">
-                    <button class="btn btn-light btn-sm rounded-pill px-3" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+                <div class="d-flex align-items-center">
+                    
+
+                    <!-- Botón Exportar Excel -->
+                    <a href="{% url 'clientes:exportar_clientes_excel' %}" 
+                       class="btn btn-success btn-sm rounded-pill px-3 shadow-sm" 
+                       title="Exportar reporte a Excel">
+                        <i class="bi bi-file-earmark-excel"></i>
+                    </a>
+                </div>
             </div>
         </div>
 

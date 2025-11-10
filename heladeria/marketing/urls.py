@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views  # vistas de marketing
+from . import views
 
 app_name = 'marketing'
 
@@ -12,9 +12,11 @@ urlpatterns = [
     path('promocion/eliminar/<int:pk>/', views.eliminar_promocion, name='eliminar_promocion'),
 
     # Campañas
-    path('campaña/crear/', views.crear_campaña, name='crear_campaña'),
-    path('campaña/editar/<int:pk>/', views.editar_campaña, name='editar_campaña'),
-    path('campaña/eliminar/<int:pk>/', views.eliminar_campaña, name='eliminar_campaña'),
+    path('campana/crear/', views.crear_campana, name='crear_campana'),
+    path('campana/editar/<int:pk>/', views.editar_campana, name='editar_campana'),
+    path('campana/eliminar/<int:pk>/', views.eliminar_campana, name='eliminar_campana'),
+    path('campanas/filtro/', views.campanas_disponibles, name='campanas_disponibles'),
+
 
     # Reportes
     path('reporte-clientes/', views.reporte_clientes, name='reporte_clientes'),

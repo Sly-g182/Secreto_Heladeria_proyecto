@@ -1,7 +1,9 @@
 from django import forms
-from .models import Promocion, Campaña
+from django.utils import timezone
+from .models import Promocion, Campana
 from productos.models import Producto, Categoria
 from clientes.models import Cliente
+
 
 class PromocionForm(forms.ModelForm):
     productos = forms.ModelMultipleChoiceField(
@@ -40,10 +42,22 @@ class PromocionForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        # ... tu validación ...
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+        hoy = timezone.localdate()
+
+        # 🔹 Validar que la fecha de inicio no sea anterior a hoy
+        if fecha_inicio and fecha_inicio < hoy:
+            self.add_error('fecha_inicio', "La fecha de inicio no puede ser anterior a hoy.")
+
+        # 🔹 Validar que la fecha de fin no sea anterior a la fecha de inicio
+        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+            self.add_error('fecha_fin', "La fecha de fin no puede ser anterior a la fecha de inicio.")
+
         return cleaned_data
 
-class CampañaForm(forms.ModelForm):
+
+class CampanaForm(forms.ModelForm):
     categoria = forms.ModelChoiceField(
         queryset=Categoria.objects.all().order_by('nombre'),
         widget=forms.Select,
@@ -52,7 +66,7 @@ class CampañaForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Campaña
+        model = Campana
         fields = [
             'nombre',
             'descripcion',
@@ -71,6 +85,14 @@ class CampañaForm(forms.ModelForm):
         cleaned_data = super().clean()
         fecha_inicio = cleaned_data.get('fecha_inicio')
         fecha_fin = cleaned_data.get('fecha_fin')
-        if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
+        hoy = timezone.localdate()
+
+        # 🔹 Validar que la fecha de inicio no sea anterior a hoy
+        if fecha_inicio and fecha_inicio < hoy:
+            self.add_error('fecha_inicio', "La fecha de inicio no puede ser anterior a hoy.")
+
+        # 🔹 Validar que la fecha de fin no sea anterior a la fecha de inicio
+        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
             self.add_error('fecha_fin', "La fecha de fin no puede ser anterior a la fecha de inicio.")
+
         return cleaned_data

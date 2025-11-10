@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% load humanize %} 
+{% load humanize %}
 
 {% block title %}{{ modo }} Promoción{% endblock title %}
 
@@ -8,34 +8,38 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'marketing:marketing_dashboard' %}">Dashboard</a></li>
+
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb bg-light p-2 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'marketing:marketing_dashboard' %}" class="text-decoration-none">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">{{ modo }} Promoción</li>
                 </ol>
             </nav>
-            
-            <h1 class="mb-4">
+
+            <h1 class="mb-4 fw-bold text-primary">
                 <i class="fas fa-bullhorn"></i> {{ modo }} Promoción
                 {% if modo == 'Editar' %}
                     <small class="text-muted fs-5"> - {{ promocion.nombre }}</small>
                 {% endif %}
             </h1>
-            
-            <div class="card shadow-lg border-{{ modo|lower|slice:':4'|default:'info' }}">
-                <div class="card-body">
-                    
+
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
                     <form method="post"
-                            {% if modo == 'Editar' %}
+                        {% if modo == 'Editar' %}
                             action="{% url 'marketing:editar_promocion' pk=promocion.id %}"
-                            {% else %}
+                        {% else %}
                             action="{% url 'marketing:crear_promocion' %}"
-                            {% endif %}>
-                            {% csrf_token %}
-                        
+                        {% endif %}
+                        id="form-promocion">
+                        {% csrf_token %}
+
                         <div class="mb-3">
-                            <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">Nombre</label>
+                            <label class="form-label fw-semibold">Nombre</label>
                             {% render_field form.nombre class="form-control" placeholder="Ej: 10% de Descuento en Helados de Fruta" %}
                             {% for error in form.nombre.errors %}
                                 <div class="text-danger small">{{ error }}</div>
@@ -43,7 +47,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-bold">Descripción</label>
+                            <label class="form-label fw-semibold">Descripción</label>
                             {% render_field form.descripcion class="form-control" rows="3" placeholder="Detalles de la oferta que verá el cliente." %}
                             {% for error in form.descripcion.errors %}
                                 <div class="text-danger small">{{ error }}</div>
@@ -52,15 +56,15 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.tipo.id_for_label }}" class="form-label fw-bold">Tipo de Descuento</label>
+                                <label class="form-label fw-semibold">Tipo de Descuento</label>
                                 {% render_field form.tipo class="form-select" %}
                                 {% for error in form.tipo.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.valor_descuento.id_for_label }}" class="form-label fw-bold">Valor (ej. 10 para 10% o 5000 para $5000)</label>
-                                {% render_field form.valor_descuento class="form-control" %}
+                                <label class="form-label fw-semibold">Valor</label>
+                                {% render_field form.valor_descuento class="form-control" placeholder="Ej: 10 o 5000" %}
                                 {% for error in form.valor_descuento.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
@@ -69,47 +73,42 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-bold">Fecha de Inicio</label>
+                                <label class="form-label fw-semibold">Fecha de Inicio</label>
                                 {% render_field form.fecha_inicio class="form-control" type="date" %}
                                 {% for error in form.fecha_inicio.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-bold">Fecha de Fin</label>
+                                <label class="form-label fw-semibold">Fecha de Fin</label>
                                 {% render_field form.fecha_fin class="form-control" type="date" %}
                                 {% for error in form.fecha_fin.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             </div>
                         </div>
-                        
-                        <!-- Productos -->
+
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Aplicar a Productos Específicos:</label>
+                            <label class="form-label fw-semibold">Aplicar a Productos Específicos</label>
                             {% render_field form.productos class="form-select" multiple="multiple" %}
-                            <div class="form-text">Si no selecciona ninguno, la promoción aplicará a toda la tienda. Use Ctrl/Cmd para seleccionar múltiples productos.</div>
+                            <div class="form-text">Si no selecciona ninguno, la promoción aplicará a toda la tienda.</div>
                             {% for error in form.productos.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
-                        <!-- Clientes beneficiados -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Clientes Beneficiados:</label>
+                            <label class="form-label fw-semibold">Clientes Beneficiados</label>
                             {% render_field form.clientes_beneficiados class="form-select" multiple="multiple" %}
-                            <div class="form-text">Seleccione los clientes que obtendrán esta promoción. Déjelo vacío si la promoción será general.</div>
+                            <div class="form-text">Seleccione los clientes específicos o déjelo vacío para aplicar a todos.</div>
                             {% for error in form.clientes_beneficiados.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
-                        <!-- Es general -->
-                        <div class="form-check mb-4">
+                        <div class="form-check mb-3">
                             {% render_field form.es_general class="form-check-input" %}
-                            <label class="form-check-label fw-bold" for="{{ form.es_general.id_for_label }}">
-                                Promoción General (aplica a todos los clientes)
-                            </label>
+                            <label class="form-check-label fw-semibold">Promoción General (aplica a todos los clientes)</label>
                             {% for error in form.es_general.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
@@ -117,43 +116,54 @@
 
                         <div class="form-check mb-4">
                             {% render_field form.activa class="form-check-input" %}
-                            <label class="form-check-label fw-bold" for="{{ form.activa.id_for_label }}">
-                                Activar Promoción (Marcar para que esté vigente)
-                            </label>
+                            <label class="form-check-label fw-semibold">Activar Promoción</label>
                             {% for error in form.activa.errors %}
                                 <div class="text-danger small">{{ error }}</div>
                             {% endfor %}
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        <button type="submit" id="submit-btn" class="btn btn-primary w-100 btn-lg shadow-sm">
                             <i class="fas fa-save"></i> {{ modo }} Promoción
                         </button>
                     </form>
                 </div>
             </div>
-            
+
             {% if modo == 'Crear' %}
             <div class="mt-5">
-                <h4 class="text-secondary border-bottom pb-2">Promociones Activas (Referencia Rápida)</h4>
+                <h4 class="text-secondary border-bottom pb-2">Promociones Activas</h4>
                 {% if promociones_activas %}
                     <ul class="list-group shadow-sm">
                         {% for promo in promociones_activas %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ promo.nombre }}</strong> ({{ promo.get_tipo_display }})
+                                    <strong>{{ promo.nombre }}</strong>
+                                    <span class="text-muted small">({{ promo.get_tipo_display }})</span>
                                 </div>
-                                <span class="badge bg-primary rounded-pill">
-                                    Finaliza: {{ promo.fecha_fin|date:"d/m/Y" }}
+                                <span class="badge bg-success">
+                                    Finaliza {{ promo.fecha_fin|date:"d/m/Y" }}
                                 </span>
                             </li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p class="text-muted">No hay promociones activas en este momento.</p>
+                    <p class="text-muted mt-2">No hay promociones activas actualmente.</p>
                 {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("form-promocion");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+    });
+});
+</script>
 {% endblock content %}

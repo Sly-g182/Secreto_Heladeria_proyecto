@@ -6,11 +6,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count, Sum, Max
 
 from ventas.models import Venta
 from clientes.models import Cliente
 from .forms import ClienteUserCreationForm, EditarPerfilForm, CambiarPasswordForm
+
+import openpyxl
+from openpyxl.styles import Font
 
 
 def register_view(request):
@@ -68,7 +71,7 @@ def editar_perfil(request):
     if request.method == 'POST':
         form = EditarPerfilForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.save()  # El form ya se encarga de actualizar User y Cliente, incluyendo imagen
+            form.save()
             messages.success(request, "Tu perfil se ha actualizado correctamente.")
             return redirect('clientes:editar_perfil')
         else:
@@ -89,7 +92,7 @@ def cambiar_password(request):
             user = request.user
             user.set_password(nueva_password)
             user.save()
-            update_session_auth_hash(request, user)  # mantiene sesión activa
+            update_session_auth_hash(request, user)
             messages.success(request, "Tu contraseña ha sido cambiada correctamente.")
             return redirect('clientes:editar_perfil')
         else:
@@ -100,20 +103,86 @@ def cambiar_password(request):
     return render(request, 'clientes/cambiar_password.html', {'form': form})
 
 
+# ------------------------------
+#     REPORTE Y EXPORTACIÓN
+# ------------------------------
+
+@staff_member_required
 @staff_member_required
 def reporte_clientes(request):
-    """Vista del panel de administración que lista los clientes registrados."""
-    q = request.GET.get('q', '').strip()
-    if q:
-        datos_clientes = Cliente.objects.filter(
-            Q(user__username__icontains=q) |
-            Q(user__email__icontains=q) |
-            Q(user__first_name__icontains=q) |
-            Q(user__last_name__icontains=q) |
-            Q(rut__icontains=q)
-        )
-    else:
-        datos_clientes = Cliente.objects.all()
+    query = request.GET.get('q', '')
 
-    context = {'datos_clientes': datos_clientes, 'now': timezone.now()}
-    return render(request, "clientes/reporte_clientes.html", context)
+    clientes = Cliente.objects.select_related('user').annotate(
+        total_ordenes=Count('venta'),
+        monto_total_gastado=Sum('venta__total'),
+        ultima_compra=Max('venta__fecha')
+    )
+
+    if query:
+        clientes = clientes.filter(Q(user__username__icontains=query))
+
+    clientes = clientes.order_by('-monto_total_gastado')
+
+    context = {
+        'datos_clientes': clientes,
+        'now': timezone.now(),
+    }
+    return render(request, 'clientes/reporte_clientes.html', context)
+
+
+
+
+@staff_member_required
+def exportar_clientes_excel(request):
+    """Genera un archivo Excel con todos los clientes registrados y sus métricas."""
+
+    # Crear el workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Clientes"
+
+    # Encabezados
+    columnas = [
+        "ID", "Usuario", "Correo", "RUT", "Teléfono",
+        "Dirección", "Fecha de Registro", "Última Compra",
+        "Total de Órdenes", "Monto Total Gastado"
+    ]
+    for col_num, columna in enumerate(columnas, 1):
+        c = ws.cell(row=1, column=col_num)
+        c.value = columna
+        c.font = Font(bold=True)
+
+    # Traer datos con agregaciones
+    clientes = Cliente.objects.select_related('user').annotate(
+        total_ordenes=Count('ventas'),
+        monto_total_gastado=Sum('ventas__total'),
+        ultima_compra=Max('ventas__fecha_venta')
+    )
+
+    # Llenar datos en la hoja
+    for row_num, cliente in enumerate(clientes, 2):
+        ws.cell(row=row_num, column=1, value=cliente.id)
+        ws.cell(row=row_num, column=2, value=cliente.user.username)
+        ws.cell(row=row_num, column=3, value=cliente.user.email)
+        ws.cell(row=row_num, column=4, value=cliente.rut or "N/A")
+        ws.cell(row=row_num, column=5, value=cliente.telefono or "N/A")
+        ws.cell(row=row_num, column=6, value=cliente.direccion or "N/A")
+        ws.cell(row=row_num, column=7, value=cliente.user.date_joined.strftime('%Y-%m-%d'))
+
+        if cliente.ultima_compra:
+            ws.cell(row=row_num, column=8, value=cliente.ultima_compra.strftime('%Y-%m-%d %H:%M'))
+        else:
+            ws.cell(row=row_num, column=8, value="N/A")
+
+        ws.cell(row=row_num, column=9, value=cliente.total_ordenes or 0)
+        ws.cell(row=row_num, column=10, value=float(cliente.monto_total_gastado or 0))
+
+    # Configurar respuesta HTTP
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = 'attachment; filename=\"reporte_clientes.xlsx\"'
+    wb.save(response)
+    return response
+
+
